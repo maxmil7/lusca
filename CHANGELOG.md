@@ -1,6 +1,8 @@
 ##### Unreleased
 
 * Changes `whitelist`/`blacklist` to `allowlist`/`blocklist` to follow [guidelines](https://chromium.googlesource.com/chromium/src/+/master/styleguide/inclusive_code.md#racially-neutral)
+* Adds support for passing in a custom function for determining `csrf` protection
+* Adds support for `allowlist`, `blocklist` and custom function config for `xframe` header
 
 
 ##### v1.6.1

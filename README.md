@@ -112,6 +112,8 @@ Or object `options` with following parameters, including `value` as before
 * `allowlist` Array or String - Optional. Allows defining a set of routes that will set the `X-FRAME-OPTIONS` header to the specified value.  All others will not.
 * `xframeFunction(req)` Function - Optional. Takes the request as a parameter and returns either the value for the header or false if the header should not be set for this route at this time.
 
+Notes: When using `options` object, the app can use either a `blocklist`, an `allowlist`, or a `xframeFunction`, only one.
+
 
 Enables X-FRAME-OPTIONS headers to help prevent [Clickjacking](https://www.owasp.org/index.php/Clickjacking).
 

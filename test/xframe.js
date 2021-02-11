@@ -45,8 +45,13 @@ describe('XFRAME', function () {
     });
 
     it('header (sameorigin) on allowlist', function (done) {
-        var config = { xframe: {value: 'SAMEORIGIN', allowlist: ['/']} },
-            app = mock(config);
+        var config = {
+            xframe: {
+                value: 'SAMEORIGIN',
+                allowlist: ['/']
+            }
+        },
+        app = mock(config);
 
         app.get('/', function (req, res) {
             res.status(200).end();
@@ -59,8 +64,13 @@ describe('XFRAME', function () {
     });
 
     it('header (sameorigin) not on allowlist', function (done) {
-        var config = { xframe: {value: 'SAMEORIGIN', allowlist: ['/allow']} },
-            app = mock(config);
+        var config = {
+            xframe: {
+                value: 'SAMEORIGIN',
+                allowlist: ['/allow']
+            }
+        },
+        app = mock(config);
 
         app.get('/', function (req, res) {
             res.status(200).end();
@@ -73,21 +83,25 @@ describe('XFRAME', function () {
         request(app)
             .get('/allow')
             .expect(200)
-            .expect('X-FRAME-OPTIONS', 'SAMEORIGIN');
+            .expect('X-FRAME-OPTIONS', config.xframe.value);
 
         request(app)
             .get('/')
             .expect(200)
             .end(function (err, res) {
-                var isHeaderPresent = res.header['x-frame-options'] !== undefined;
-                assert(!isHeaderPresent);
+                assert.strictEqual(res.header['x-frame-options'], undefined);
                 done();
             });
     });
 
     it('header (sameorigin) on blocklist', function (done) {
-        var config = { xframe: {value: 'SAMEORIGIN', blocklist: ['/', '/block']} },
-            app = mock(config);
+        var config = {
+            xframe: {
+                value: 'SAMEORIGIN',
+                blocklist: ['/', '/block']
+            }
+        },
+        app = mock(config);
 
         app.get('/', function (req, res) {
             res.status(200).end();
@@ -105,31 +119,31 @@ describe('XFRAME', function () {
             .get('/block')
             .expect(200)
             .end(function (err, res) {
-                var isHeaderPresent = res.header['x-frame-options'] !== undefined;
-                assert(!isHeaderPresent);
+                assert.strictEqual(res.header['x-frame-options'], undefined);
             });
 
         request(app)
             .get('/allow')
             .expect(200)
-            .end(function (err, res) {
-                var isHeaderPresent = res.header['x-frame-options'] !== undefined;
-                assert(isHeaderPresent);
-            });
+            .expect('X-FRAME-OPTIONS', config.xframe.value);
 
         request(app)
             .get('/')
             .expect(200)
             .end(function (err, res) {
-                var isHeaderPresent = res.header['x-frame-options'] !== undefined;
-                assert(!isHeaderPresent);
+                assert.strictEqual(res.header['x-frame-options'], undefined);
                 done();
             });
     });
 
     it('header (sameorigin) not on string blocklist', function (done) {
-        var config = { xframe: {value: 'SAMEORIGIN', blocklist: '/block'} },
-            app = mock(config);
+        var config = {
+            xframe: {
+                value: 'SAMEORIGIN',
+                blocklist: '/block'
+            }
+        },
+        app = mock(config);
 
         app.get('/', function (req, res) {
             res.status(200).end();
@@ -143,21 +157,29 @@ describe('XFRAME', function () {
         request(app)
             .get('/block')
             .end(function (err, res) {
-                var headerNotPresent = res.header['x-frame-options'] === undefined;
-                assert(headerNotPresent);
+                assert.strictEqual(res.header['x-frame-options'], undefined);
                 done();
             });
     });
 
     it('header function', function (done) {
-        var configTrue = { xframe: {xframeFunction: function (req) {
-            return 'SAMEORIGIN';
-        } } },
-            configFalse = { xframe: {xframeFunction: function (req) {
-                return false;
-            } } },
-            app = mock(configTrue),
-            app2 = mock(configFalse);
+        var configTrue = {
+            xframe: {
+                xframeFunction: function (req) {
+                    return 'SAMEORIGIN';
+                }
+            }
+        },
+        configFalse = {
+            xframe: {
+                xframeFunction: function (req) {
+                    return false;
+                }
+            }
+        },
+
+        app = mock(configTrue),
+        app2 = mock(configFalse);
 
         app.get('/', function (req, res) {
             res.status(200).end();
@@ -175,8 +197,7 @@ describe('XFRAME', function () {
         request(app2)
             .get('/')
             .end(function (err, res) {
-                var headerNotPresent = res.header['x-frame-options'] === undefined;
-                assert(headerNotPresent);
+                assert.strictEqual(res.header['x-frame-options'], undefined);
                 done();
             });
     });

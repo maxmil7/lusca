@@ -23,6 +23,7 @@ describe('CSRF', function () {
     it('method', function () {
         assert(typeof lusca.csrf === 'function');
     });
+
     it('expects a thrown error if no session object', function (done) {
         var app = mock({
             csrf: true
@@ -42,14 +43,15 @@ describe('CSRF', function () {
                 done(err);
             });
     });
+
     it('should not require token on post to blocklist', function (done) {
         var app = mock({
             csrf: {
-                blocklist: ['/blocklist1', '/blocklist2', '/']
+                blocklist: ['/blocklist1', '/blocklist2']
             }
         });
 
-        app.post('/', function (req, res) {
+        app.post('/blocklist1', function (req, res) {
             res.send(200);
         });
 
@@ -60,11 +62,6 @@ describe('CSRF', function () {
         app.post('/notblocklist', function (req, res) {
             res.send(200);
         });
-
-        request(app)
-            .post('/')
-            .expect(200)
-            .end(function (err, res) {});
 
         request(app)
             .post('/blocklist1')
@@ -83,10 +80,11 @@ describe('CSRF', function () {
                 done(err);
             });
     });
+
     it('should only require token on post to allowlist', function (done) {
         var app = mock({
             csrf: {
-                allowlist: ['/', '/allowlist1', '/allowlist2']
+                allowlist: ['/allowlist1', '/allowlist2']
             }
         });
 
@@ -99,10 +97,6 @@ describe('CSRF', function () {
         });
 
         app.post('/notallowlist', function (req, res) {
-            res.send(200);
-        });
-
-        app.post('/', function (req, res) {
             res.send(200);
         });
 
@@ -119,21 +113,20 @@ describe('CSRF', function () {
         request(app)
             .post('/notallowlist')
             .expect(200)
-            .end(function (err, res) {});
-
-        request(app)
-            .post('/')
-            .expect(403)
             .end(function (err, res) {
                 done(err);
             });
     });
 
     it('csrf function', function (done) {
-        var config = { csrf: {csrfFunction: function (req) {
-            return false;
-        } } },
-            app = mock(config);
+        var config = {
+            csrf: {
+                csrfFunction: function (req) {
+                    return false;
+                }
+            }
+        },
+        app = mock(config);
 
         app.get('/', function (req, res) {
             res.status(200).end();
@@ -143,10 +136,14 @@ describe('CSRF', function () {
             .post('/')
             .expect(200);
 
-        var config1 = { csrf: {csrfFunction: function (req) {
-            return true;
-        } } },
-            app1 = mock(config1);
+        var config1 = {
+            csrf: {
+                csrfFunction: function (req) {
+                    return true;
+                }
+            }
+        },
+        app1 = mock(config1);
 
         app1.get('/', function (req, res) {
             res.status(200).end();
@@ -182,7 +179,6 @@ describe('CSRF', function () {
                     done(err);
                 });
         });
-
 
         it('POST (200 OK with token) (session type: {value})', function (ctx, done) {
             var mockConfig = (ctx.value === 'cookie') ? {
@@ -245,7 +241,6 @@ describe('CSRF', function () {
                 });
         });
 
-
         it('POST (403 Forbidden on no token) (session type: {value})', function (ctx, done) {
             var mockConfig = (ctx.value === 'cookie') ? {
                     csrf: {
@@ -267,7 +262,6 @@ describe('CSRF', function () {
                     done(err);
                 });
         });
-
 
         it('Should allow custom keys (session type: {value})', function (ctx, done) {
             var mockConfig = (ctx.value === 'cookie') ? {
